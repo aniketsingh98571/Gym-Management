@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     }
 
     // Add email to Firestore
-    const docRef = await addDoc(collection(db, "waitlist"), {
+    await addDoc(collection(db, "waitlist"), {
       email,
       timestamp: new Date().toISOString(),
     });
