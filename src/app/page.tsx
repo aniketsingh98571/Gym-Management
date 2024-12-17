@@ -277,7 +277,7 @@ export default function Home() {
               </button>
               {status === "success" && (
                 <p className="text-sm text-green-500 mt-2">
-                  Thanks for joining! We&apos;ll be in touch soon.
+                  {`Thanks for joining! We'll be in touch soon.`}
                 </p>
               )}
               {status === "error" && (
@@ -340,8 +340,7 @@ const features = [
   {
     icon: <DumbbellIcon className="w-6 h-6" />,
     title: "Digital Onboarding",
-    description:
-      "Streamline your gym&apos;s member registration process with our digital onboarding system",
+    description: `Streamline your gym's member registration process with our digital onboarding system`,
     mockup:
       "https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?w=300&h=600&fit=crop",
     benefits: [
