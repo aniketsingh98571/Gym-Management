@@ -9,10 +9,16 @@ import {
   UsersIcon,
   BuildingIcon,
   StarIcon,
+  ClockIcon,
+  TrendingUpIcon,
+  ZapIcon,
 } from "lucide-react";
 import { DumbbellIcon } from "./icons/DumbbellIcon";
 import { SaladIcon } from "./icons/SaladIcon";
 import { Navbar } from "@/components/Navbar";
+import { useState } from "react";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 /**
  * Note: The mockup images used are temporary placeholders from Unsplash.
@@ -41,6 +47,30 @@ const jsonLd = {
 };
 
 export default function Home() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("loading");
+
+    try {
+      // Add email directly to Firestore
+      await addDoc(collection(db, "waitlist"), {
+        email,
+        timestamp: new Date().toISOString(),
+      });
+
+      setStatus("success");
+      setEmail("");
+    } catch (error) {
+      console.error("Error submitting email:", error);
+      setStatus("error");
+    }
+  };
+
   const scrollToSection = (elementId: string) => {
     document.getElementById(elementId)?.scrollIntoView({ behavior: "smooth" });
   };
@@ -84,11 +114,7 @@ export default function Home() {
             <div className="absolute inset-0 bg-gradient-to-r from-background/80 to-transparent rounded-2xl" />
             <div className="absolute top-4 right-4 flex gap-4">
               <div className="bg-background/80 backdrop-blur-sm p-3 rounded-xl border border-border">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs md:text-sm font-medium">
-                    500+ Gyms Trust Us
-                  </span>
-                </div>
+                <div className="flex items-center gap-2"></div>
               </div>
             </div>
           </div>
@@ -165,40 +191,40 @@ export default function Home() {
                 Transform Your Gym Management Today
               </h2>
               <p className="text-muted-foreground">
-                Join hundreds of successful gym owners who have revolutionized
-                their business with our comprehensive management solution.
+                Experience the next generation of gym management with our
+                comprehensive solution.
               </p>
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                    <UsersIcon className="w-6 h-6 text-primary" />
+                    <ClockIcon className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold">10,000+ Active Members</h4>
+                    <h4 className="font-semibold">Save 15+ Hours Weekly</h4>
                     <p className="text-sm text-muted-foreground">
-                      Managed through our platform
+                      Automate repetitive administrative tasks
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                    <BuildingIcon className="w-6 h-6 text-primary" />
+                    <TrendingUpIcon className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold">500+ Gyms</h4>
+                    <h4 className="font-semibold">Boost Member Retention</h4>
                     <p className="text-sm text-muted-foreground">
-                      Trust our platform daily
+                      Improve engagement with personalized experiences
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                    <StarIcon className="w-6 h-6 text-primary" />
+                    <ZapIcon className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold">4.9/5 Rating</h4>
+                    <h4 className="font-semibold">Real-time Insights</h4>
                     <p className="text-sm text-muted-foreground">
-                      From satisfied customers
+                      Make data-driven decisions instantly
                     </p>
                   </div>
                 </div>
@@ -232,18 +258,36 @@ export default function Home() {
               Be the first to know when we launch. Early access for waitlist
               members.
             </p>
-            <form className="flex flex-col gap-2 max-w-md mx-auto md:mx-0">
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col gap-2 max-w-md mx-auto md:mx-0"
+            >
               <input
                 type="email"
+                required
                 placeholder="Enter your email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="px-4 py-3 rounded-xl bg-background border border-border focus:outline-none focus:ring-2 focus:ring-primary text-sm md:text-base"
               />
               <button
-                className="bg-primary text-white px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors text-sm md:text-base"
+                type="submit"
+                disabled={status === "loading"}
+                className="bg-primary text-white px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors text-sm md:text-base disabled:opacity-50"
                 aria-label="Join GymCenter Waitlist"
               >
-                Join Now
+                {status === "loading" ? "Joining..." : "Join Now"}
               </button>
+              {status === "success" && (
+                <p className="text-sm text-green-500 mt-2">
+                  Thanks for joining! We'll be in touch soon.
+                </p>
+              )}
+              {status === "error" && (
+                <p className="text-sm text-red-500 mt-2">
+                  Something went wrong. Please try again.
+                </p>
+              )}
             </form>
           </div>
 
@@ -300,86 +344,75 @@ const features = [
     icon: <DumbbellIcon className="w-6 h-6" />,
     title: "Digital Onboarding",
     description:
-      "Streamline your member registration process with our digital onboarding system",
+      "Streamline your gym's member registration process with our digital onboarding system",
     mockup:
       "https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?w=300&h=600&fit=crop",
     benefits: [
       {
         title: "Quick Registration",
         description:
-          "Complete member registration in under 2 minutes with our intuitive form",
+          "Process new member registrations in under 2 minutes with our intuitive system",
       },
       {
         title: "Digital Records",
         description:
-          "Maintain organized digital records of all member information",
+          "Maintain organized digital records of all your members and their information",
       },
       {
         title: "Automated Welcome",
-        description: "Send automated welcome emails with membership details",
+        description: "Automatically send branded welcome emails to new members",
       },
     ],
   },
   {
     icon: <BellIcon className="w-6 h-6" />,
-    title: "Renewal Alerts",
-    description: "Automated notifications for membership renewals",
+    title: "Renewal Management",
+    description: "Automated membership renewal system for your gym",
     mockup:
       "https://images.unsplash.com/photo-1533749047139-189de3cf06d3?w=300&h=600&fit=crop",
     benefits: [
       {
-        title: "Timely Reminders",
-        description: "Get automatic notifications before membership expires",
+        title: "Smart Notifications",
+        description:
+          "Automated reminders sent to members before membership expiry",
       },
       {
-        title: "Flexible Renewal",
-        description: "Multiple options for membership renewal",
-      },
-      {
-        title: "Payment Tracking",
-        description: "Track all membership payments and history",
+        title: "Flexible Plans",
+        description: "Manage multiple membership tiers and renewal options",
       },
     ],
   },
   {
     icon: <SaladIcon className="w-6 h-6" />,
-    title: "Diet Plans",
-    description: "Personalized diet plans sent directly to members",
+    title: "Diet Plan Management",
+    description: "Create and manage personalized diet plans for your members",
     mockup:
       "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300&h=600&fit=crop",
     benefits: [
       {
-        title: "Customized Meal Plans",
-        description: "Get personalized meal plans based on your goals",
+        title: "Plan Creation",
+        description: "Easy-to-use interface for creating customized meal plans",
       },
       {
-        title: "Nutritional Guidance",
-        description: "Expert advice on nutrition and supplements",
-      },
-      {
-        title: "Diet Tracking",
-        description: "Track your daily nutrition and progress",
+        title: "Nutrition Management",
+        description: "Track and manage nutritional programs for members",
       },
     ],
   },
   {
     icon: <CalendarIcon className="w-6 h-6" />,
-    title: "Workout Schedule",
-    description: "Custom workout plans and progress tracking",
+    title: "Workout Management",
+    description: "Comprehensive workout planning and tracking system",
     mockup:
       "https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=300&h=600&fit=crop",
     benefits: [
       {
-        title: "Personalized Routines",
-        description: "Custom workout plans for your goals",
+        title: "Program Creation",
+        description: "Create and assign customized workout programs to members",
       },
       {
-        title: "Exercise Tutorials",
-        description: "Detailed guides for each exercise",
-      },
-      {
-        title: "Progress Monitoring",
-        description: "Track your fitness journey",
+        title: "Exercise Library",
+        description: "Access to extensive exercise database with instructions",
       },
     ],
   },
