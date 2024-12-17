@@ -56,7 +56,7 @@ export default function Home() {
           <div className="space-y-6 md:space-y-8 text-center md:text-left">
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold leading-tight">
               Unleash Your
-              <span className="text-primary"> Gym's </span>
+              <span className="text-primary"> Gym&apos;s </span>
               Full Potential
             </h1>
             <p className="text-base md:text-lg text-muted-foreground max-w-lg mx-auto md:mx-0">
