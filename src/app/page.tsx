@@ -307,6 +307,33 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Feature Request Section */}
+      <section className="py-16 px-4 md:px-6 bg-background">
+        <div className="max-w-6xl mx-auto text-center">
+          <div className="inline-flex items-center justify-center p-2 bg-primary/10 rounded-full mb-6">
+            <ZapIcon className="w-5 h-5 text-primary mr-2" />
+            <span className="text-sm font-medium text-primary">
+              Feature Requests
+            </span>
+          </div>
+          <h2 className="text-2xl md:text-4xl font-bold mb-4">
+            Need Something More?
+          </h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
+            We&apos;re constantly evolving and adding new features. Join our
+            waitlist to request custom features and shape the future of
+            GymCenter.
+          </p>
+          <button
+            onClick={() => scrollToSection("notify-section")}
+            className="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-full font-medium inline-flex items-center gap-2 transition-colors"
+          >
+            Request Features
+            <ArrowRightIcon className="w-5 h-5" />
+          </button>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="bg-accent py-8 md:py-12 px-4 md:px-6">
         <div className="max-w-6xl mx-auto">
