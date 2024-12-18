@@ -44,7 +44,11 @@ const jsonLd = {
 };
 
 export default function Home() {
+  const [contactMethod, setContactMethod] = useState<"email" | "phone">(
+    "email"
+  );
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [status, setStatus] = useState<
     "idle" | "loading" | "success" | "error"
   >("idle");
@@ -54,16 +58,17 @@ export default function Home() {
     setStatus("loading");
 
     try {
-      // Add email directly to Firestore
       await addDoc(collection(db, "waitlist"), {
-        email,
+        contactMethod,
+        [contactMethod]: contactMethod === "email" ? email : phone,
         timestamp: new Date().toISOString(),
       });
 
       setStatus("success");
       setEmail("");
+      setPhone("");
     } catch (error) {
-      console.error("Error submitting email:", error);
+      console.error("Error submitting contact:", error);
       setStatus("error");
     }
   };
@@ -259,14 +264,54 @@ export default function Home() {
               onSubmit={handleSubmit}
               className="flex flex-col gap-2 max-w-md mx-auto md:mx-0"
             >
-              <input
-                type="email"
-                required
-                placeholder="Enter your email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="px-4 py-3 rounded-xl bg-background border border-border focus:outline-none focus:ring-2 focus:ring-primary text-sm md:text-base"
-              />
+              <div className="flex gap-4 mb-2">
+                <button
+                  type="button"
+                  onClick={() => setContactMethod("email")}
+                  className={`flex-1 px-4 py-2 rounded-xl border ${
+                    contactMethod === "email"
+                      ? "bg-primary text-white border-primary"
+                      : "bg-background border-border"
+                  }`}
+                >
+                  Email
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setContactMethod("phone")}
+                  className={`flex-1 px-4 py-2 rounded-xl border ${
+                    contactMethod === "phone"
+                      ? "bg-primary text-white border-primary"
+                      : "bg-background border-border"
+                  }`}
+                >
+                  Phone
+                </button>
+              </div>
+
+              {contactMethod === "email" ? (
+                <input
+                  type="email"
+                  required
+                  placeholder="Enter your email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="px-4 py-3 rounded-xl bg-background border border-border focus:outline-none focus:ring-2 focus:ring-primary text-sm md:text-base"
+                />
+              ) : (
+                <input
+                  type="number"
+                  required
+                  placeholder="Enter your phone number"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  min="1000000000"
+                  max="9999999999"
+                  title="Please enter a valid 10-digit phone number"
+                  className="px-4 py-3 rounded-xl bg-background border border-border focus:outline-none focus:ring-2 focus:ring-primary text-sm md:text-base [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              )}
+
               <button
                 type="submit"
                 disabled={status === "loading"}
@@ -275,9 +320,10 @@ export default function Home() {
               >
                 {status === "loading" ? "Joining..." : "Join Now"}
               </button>
+
               {status === "success" && (
                 <p className="text-sm text-green-500 mt-2">
-                  {`Thanks for joining! We'll be in touch soon.`}
+                  Thanks for joining! We&apos;ll be in touch soon.
                 </p>
               )}
               {status === "error" && (
